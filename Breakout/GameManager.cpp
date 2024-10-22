@@ -2,6 +2,8 @@
 #include "Ball.h"
 #include "PowerupManager.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 GameManager::GameManager(sf::RenderWindow* window)
     : _window(window), _paddle(nullptr), _ball(nullptr), _brickManager(nullptr), _powerupManager(nullptr),
@@ -28,7 +30,7 @@ void GameManager::initialize()
     _brickManager->createBricks(5, 10, 80.0f, 30.0f, 5.0f);
 }
 
-void GameManager::update(float dt)
+void GameManager::update(float dt, std::stringstream* ss)
 {
     _powerupInEffect = _powerupManager->getPowerupInEffect();
     _ui->updatePowerupText(_powerupInEffect);
@@ -42,8 +44,24 @@ void GameManager::update(float dt)
     }
     if (_levelComplete)
     {
-        _masterText.setString("Level completed.");
-        return;
+       
+        _masterText.setString("Level completed. Please Enter 3 Initials [ENTER TO SUBMIT]: ");
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+        {
+            std::string input = ss->str();
+            std::ofstream leaderboard("LeaderBoard.txt");
+
+            int seconds = _timeCompleted;
+            int minutes = seconds / 60;
+            seconds %= 60;
+            minutes %= 60;
+
+            leaderboard << input << " " << minutes << ":" << seconds << ",\n";
+        }
+       
+
+       
+        //return;
     }
     // pause and pause handling
     if (_pauseHold > 0.f) _pauseHold -= dt;
@@ -107,7 +125,14 @@ void GameManager::render()
 
 void GameManager::levelComplete()
 {
+    _timeCompleted = _time;
     _levelComplete = true;
+
+}
+
+bool GameManager::getLevelComplete()
+{
+    return _levelComplete;
 }
 
 sf::RenderWindow* GameManager::getWindow() const { return _window; }

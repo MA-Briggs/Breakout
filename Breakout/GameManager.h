@@ -14,10 +14,11 @@ class GameManager {
 public:
     GameManager(sf::RenderWindow* window);
     void initialize();
-    void update(float dt);
+    void update(float dt, std::stringstream* ss);
     void loseLife();
     void render();
     void levelComplete();
+    bool getLevelComplete();
     void powerupEffect(POWERUPS pu, float t);
 
     Paddle* getPaddle() const;
@@ -32,6 +33,7 @@ private:
     float _pauseHold;
     float _time;
     float _timeLastPowerupSpawned;
+    float _timeCompleted;
     int _lives;
     bool _levelComplete;
     std::pair<POWERUPS, float> _powerupInEffect;
