@@ -40,6 +40,7 @@ private:
 
     sf::Font _font;
     sf::Text _masterText;
+    sf::Text _miniText;
 
     sf::RenderWindow* _window;
     Paddle* _paddle;

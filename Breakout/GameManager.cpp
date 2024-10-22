@@ -15,6 +15,11 @@ GameManager::GameManager(sf::RenderWindow* window)
     _masterText.setPosition(50, 400);
     _masterText.setCharacterSize(48);
     _masterText.setFillColor(sf::Color::Yellow);
+
+    _miniText.setFont(_font);
+    _miniText.setPosition(50, 500);
+    _miniText.setCharacterSize(24);
+    _miniText.setFillColor(sf::Color::Yellow);
 }
 
 void GameManager::initialize()
@@ -28,13 +33,23 @@ void GameManager::initialize()
 
     // Create bricks
     _brickManager->createBricks(5, 10, 80.0f, 30.0f, 5.0f);
+    levelComplete();
 }
 
 void GameManager::update(float dt, std::stringstream* ss)
 {
-    _powerupInEffect = _powerupManager->getPowerupInEffect();
-    _ui->updatePowerupText(_powerupInEffect);
-    _powerupInEffect.second -= dt;
+    if (_powerupManager) { 
+        _powerupInEffect = _powerupManager->getPowerupInEffect();
+        _ui->updatePowerupText(_powerupInEffect);
+        _powerupInEffect.second -= dt;
+
+        if (_time > _timeLastPowerupSpawned + POWERUP_FREQUENCY && rand() % 700 == 0)      // TODO parameterise
+        {
+            _powerupManager->spawnPowerup();
+            _timeLastPowerupSpawned = _time;
+        }
+    }
+   
     
 
     if (_lives <= 0)
@@ -44,12 +59,22 @@ void GameManager::update(float dt, std::stringstream* ss)
     }
     if (_levelComplete)
     {
-       
-        _masterText.setString("Level completed. Please Enter 3 Initials [ENTER TO SUBMIT]: ");
+        delete _ball;
+        _ball = nullptr;
+
+        delete _paddle;
+        _paddle = NULL;
+
+        delete _powerupManager;
+        _powerupManager = NULL;
+
+        _masterText.setString("Level completed. ");
+        _miniText.setString("Please Enter 3 Initials [ENTER TO SUBMIT]:  " + ss->str());
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
         {
             std::string input = ss->str();
-            std::ofstream leaderboard("LeaderBoard.txt");
+            std::ofstream leaderboard;
+            leaderboard.open("LeaderBoard.txt", std::ios_base::app);
 
             int seconds = _timeCompleted;
             int minutes = seconds / 60;
@@ -89,20 +114,20 @@ void GameManager::update(float dt, std::stringstream* ss)
     _time += dt;
 
 
-    if (_time > _timeLastPowerupSpawned + POWERUP_FREQUENCY && rand()%700 == 0)      // TODO parameterise
-    {
-        _powerupManager->spawnPowerup();
-        _timeLastPowerupSpawned = _time;
-    }
+ 
 
     // move paddle
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) _paddle->moveRight(dt);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) _paddle->moveLeft(dt);
+    if (_paddle) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) _paddle->moveRight(dt);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) _paddle->moveLeft(dt);
+    }
+ 
 
     // update everything 
-    _paddle->update(dt);
-    _ball->update(dt);
-    _powerupManager->update(dt);
+    if (_paddle) { _paddle->update(dt); }
+    if(_ball){ _ball->update(dt); }
+   
+    if (_powerupManager) { _powerupManager->update(dt); }
 }
 
 void GameManager::loseLife()
@@ -115,11 +140,12 @@ void GameManager::loseLife()
 
 void GameManager::render()
 {
-    _paddle->render();
-    _ball->render();
+    if (_paddle) { _paddle->render(); }
+    if (_ball) { _ball->render(); }
     _brickManager->render();
-    _powerupManager->render();
+    if (_powerupManager) { _powerupManager->render(); }
     _window->draw(_masterText);
+    _window->draw(_miniText);
     _ui->render();
 }
 
