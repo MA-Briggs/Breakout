@@ -10,12 +10,12 @@ PowerupFireBall::PowerupFireBall(sf::RenderWindow* window, Paddle* paddle, Ball*
 PowerupFireBall::~PowerupFireBall()
 {
 
-    int* pInteger = new int();
+    //int* pInteger = new int();
 
-    if (pInteger != nullptr)
-    {
-        // use my pointer to do things.
-    }
+    //if (pInteger != nullptr)
+    //{
+    //    // use my pointer to do things.
+    //}
 
 
     
