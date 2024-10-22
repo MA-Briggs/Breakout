@@ -70,9 +70,11 @@ void GameManager::update(float dt, std::stringstream* ss)
 
         _masterText.setString("Level completed. ");
         _miniText.setString("Please Enter 3 Initials [ENTER TO SUBMIT]:  " + ss->str());
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) && _showLeaderBoard == false)
         {
+            _showLeaderBoard = true;
             std::string input = ss->str();
+            input.erase(input.length() - 1, 1);
             std::ofstream leaderboard;
             leaderboard.open("LeaderBoard.txt", std::ios_base::app);
 
@@ -81,7 +83,12 @@ void GameManager::update(float dt, std::stringstream* ss)
             seconds %= 60;
             minutes %= 60;
 
-            leaderboard << input << " " << minutes << ":" << seconds << ",\n";
+            leaderboard << input << ";" << minutes << ":" << seconds << ",\n";
+
+            leaderboard.close();
+        }
+        else if (_showLeaderBoard) {
+
         }
        
 

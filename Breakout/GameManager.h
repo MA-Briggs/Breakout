@@ -36,6 +36,7 @@ private:
     float _timeCompleted;
     int _lives;
     bool _levelComplete;
+    bool _showLeaderBoard = false;
     std::pair<POWERUPS, float> _powerupInEffect;
 
     sf::Font _font;
