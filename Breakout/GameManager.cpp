@@ -27,7 +27,7 @@ GameManager::GameManager(sf::RenderWindow* window)
     for (int i = 0; i < 10; i++) {
         sf::Text temp;
         temp.setFont(_font);
-        temp.setPosition(50, (100 + (100*1)));
+        temp.setPosition(450, (150 + (50*i)));
         temp.setCharacterSize(24);
         temp.setFillColor(sf::Color::Yellow);
         _leaderboardText.push_back(temp);
@@ -51,7 +51,7 @@ void GameManager::initialize()
 
     // Create bricks
     _brickManager->createBricks(5, 10, 80.0f, 30.0f, 5.0f);
-    levelComplete();
+    
 }
 
 void GameManager::update(float dt, std::stringstream* ss)
@@ -87,7 +87,7 @@ void GameManager::update(float dt, std::stringstream* ss)
         _powerupManager = NULL;
 
         _masterText.setString("Level completed. ");
-        _miniText.setString("Please Enter 3 Initials [ENTER TO SUBMIT]:  " + ss->str());
+        _miniText.setString("Please Enter Your Name [ENTER TO SUBMIT]:  " + ss->str());
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) && _showLeaderBoard == false)
         {
             _showLeaderBoard = true;
@@ -129,10 +129,7 @@ void GameManager::update(float dt, std::stringstream* ss)
 
             sort(times.begin(), times.end(), [](const std::vector<int>& v1, const std::vector<int>& v2){ return v1[1] < v2[1];});
 
-            while (times.size() > 10) {
-                times.erase(times.end());
-            }
-
+            times.resize(10);
             for (int i = 0; i < times.size(); i++) {
 
                 std::stringstream ss2;
@@ -204,12 +201,15 @@ void GameManager::render()
     if (_ball) { _ball->render(); }
     _brickManager->render();
     if (_powerupManager) { _powerupManager->render(); }
-    _window->draw(_masterText);
-    _window->draw(_miniText);
+    
     if (_showLeaderBoard) {
         for (int i = 0; i < 10; i++) {
             _window->draw(_leaderboardText[i]);
         }
+    }
+    else {
+        _window->draw(_masterText);
+        _window->draw(_miniText);
     }
     _ui->render();
 }
