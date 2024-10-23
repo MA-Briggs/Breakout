@@ -13,6 +13,7 @@
 class GameManager {
 public:
     GameManager(sf::RenderWindow* window);
+    bool sortcol(const std::vector<int>& v1, const std::vector<int>& v2);
     void initialize();
     void update(float dt, std::stringstream* ss);
     void loseLife();
@@ -42,6 +43,7 @@ private:
     sf::Font _font;
     sf::Text _masterText;
     sf::Text _miniText;
+    std::vector<sf::Text> _leaderboardText;
 
     sf::RenderWindow* _window;
     Paddle* _paddle;
@@ -53,4 +55,7 @@ private:
 
     static constexpr float PAUSE_TIME_BUFFER = 0.5f;
     static constexpr float POWERUP_FREQUENCY = 7.5f;    // time between minimum powerup spawn
+
+  
+
 };

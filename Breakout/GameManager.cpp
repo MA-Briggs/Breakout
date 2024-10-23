@@ -2,6 +2,9 @@
 #include "Ball.h"
 #include "PowerupManager.h"
 #include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 
@@ -20,7 +23,22 @@ GameManager::GameManager(sf::RenderWindow* window)
     _miniText.setPosition(50, 500);
     _miniText.setCharacterSize(24);
     _miniText.setFillColor(sf::Color::Yellow);
+
+    for (int i = 0; i < 10; i++) {
+        sf::Text temp;
+        temp.setFont(_font);
+        temp.setPosition(50, (100 + (100*1)));
+        temp.setCharacterSize(24);
+        temp.setFillColor(sf::Color::Yellow);
+        _leaderboardText.push_back(temp);
+    }
 }
+
+bool GameManager::sortcol(const std::vector<int>& v1, const std::vector<int>& v2)
+{
+    return v1[1] < v2[1];
+}
+
 
 void GameManager::initialize()
 {
@@ -83,11 +101,46 @@ void GameManager::update(float dt, std::stringstream* ss)
             seconds %= 60;
             minutes %= 60;
 
-            leaderboard << input << ";" << minutes << ":" << seconds << ",\n";
+            leaderboard << input << " " << minutes << ":" << seconds << ";" << _timeCompleted << ",";
 
             leaderboard.close();
         }
         else if (_showLeaderBoard) {
+            std::ifstream leaderboard;
+            leaderboard.open("LeaderBoard.txt");
+            std::string line;
+            std::string section;
+            std::vector<std::string> split_sections;
+            std::vector<std::vector<int>> times;
+            char delim = ',';
+            char delim2 = ';';
+            while (getline(leaderboard, line, delim)) {
+
+                std::stringstream ss2(line);
+                while (getline(ss2, section, delim2)) {
+                    split_sections.push_back(section);
+                }
+
+            }
+
+            for (int i = 1; i <= split_sections.size(); i += 2) {
+                times.push_back({ i-1 , stoi(split_sections.at(i)) });
+            }
+
+            sort(times.begin(), times.end(), [](const std::vector<int>& v1, const std::vector<int>& v2){ return v1[1] < v2[1];});
+
+            while (times.size() > 10) {
+                times.erase(times.end());
+            }
+
+            for (int i = 0; i < times.size(); i++) {
+
+                std::stringstream ss2;
+                ss2 << split_sections.at(times[i][0]);
+
+                _leaderboardText.at(i).setString(ss2.str());
+            }
+
 
         }
        
@@ -153,6 +206,11 @@ void GameManager::render()
     if (_powerupManager) { _powerupManager->render(); }
     _window->draw(_masterText);
     _window->draw(_miniText);
+    if (_showLeaderBoard) {
+        for (int i = 0; i < 10; i++) {
+            _window->draw(_leaderboardText[i]);
+        }
+    }
     _ui->render();
 }
 
@@ -167,6 +225,7 @@ bool GameManager::getLevelComplete()
 {
     return _levelComplete;
 }
+
 
 sf::RenderWindow* GameManager::getWindow() const { return _window; }
 UI* GameManager::getUI() const { return _ui; }
