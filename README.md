@@ -32,4 +32,19 @@ fire ball (green)
 * Implement commentary with calls to an LLM such as LLama
 
 # Time Details and Changelist
-<Add information to this section about the time you've taken for this task along with a professional changelist.>
+Total time spent working on project: 03:53:00
+
+Fixed compiler error caused by incorrect include in PowerupBase.h - 23 minutes
+
+Set up .txt file creation to store leaderboard,
+Implemented user text input,
+Implemented write to file - 1 hour
+
+Implemented text display for users,
+Set up validations for functions which use objects that get deleted for the leaderboard function, - 49 minutes
+
+Implemented read from file,
+sorted data based on time - 1 hour 27 minutes
+
+Set up the display for the leaderboard,
+Testing - 14 minutes
